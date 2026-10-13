@@ -9,6 +9,7 @@
 <body>
   <header>
     <h1>ESP32 Robot</h1>
+    <span id="mockBadge" class="status mock" hidden>MOCK</span>
     <span id="status" class="status off">Desconectado</span>
   </header>
 
@@ -21,8 +22,16 @@
     </section>
 
     <section class="card">
+      <h2>Servos (ajuste fino)</h2>
+      <label>Pan <input id="panSlider" type="range" min="0" max="180" value="90"></label>
+      <label>Tilt <input id="tiltSlider" type="range" min="0" max="180" value="90"></label>
+      <p class="hint">Teclado: flechas para mover, espacio para centrar.</p>
+    </section>
+
+    <section class="card">
       <h2>Sensor de distancia</h2>
       <p class="distance"><span id="distance">--</span> cm</p>
+      <div class="bar"><div id="distanceBar"></div></div>
     </section>
   </main>
 

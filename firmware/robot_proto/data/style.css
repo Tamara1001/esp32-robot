@@ -64,3 +64,16 @@ button {
 }
 
 .distance { font-size: 2rem; margin: 0; }
+
+.status.mock { background: #ffd166; color: #000; margin-left: auto; margin-right: 8px; }
+.status[hidden] { display: none; }
+
+label { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+input[type="range"] { flex: 1; }
+.hint { font-size: 0.75rem; opacity: 0.6; margin: 8px 0 0; }
+
+.bar { height: 10px; background: #262a37; border-radius: 5px; overflow: hidden; margin-top: 8px; }
+#distanceBar { height: 100%; width: 0; background: var(--ok); transition: width 0.15s; }
+#distanceBar.warn { background: #ffd166; }
+#distanceBar.danger { background: var(--bad); }
+

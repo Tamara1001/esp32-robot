@@ -19,6 +19,10 @@ Prototipo de robot con **ESP32**, **Arduino IDE** y **joystick web por WiFi**.
 4. Subir el sketch `firmware/robot_proto/robot_proto.ino`.
 5. Conectarse a la red WiFi `ESP32-Robot` (clave en `config.h`) y abrir `http://192.168.4.1`.
 
+## Desarrollar la web sin hardware
+
+Abrir `firmware/robot_proto/data/index.html` directo en el navegador (o agregar `?mock` a la URL). Se simula el ESP32: la distancia varía sola y los comandos `S:pan,tilt` se muestran en la consola del navegador (F12).
+
 ## Documentación
 
 | Archivo | Contenido |

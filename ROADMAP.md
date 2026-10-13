@@ -36,5 +36,5 @@
 
 ## Preguntas abiertas
 - Al sumar la cámara: ¿ESP32-CAM único o ESP32 de control + ESP32-CAM de video?
-- ¿Batería: 2x18650 en serie (7.4V) con regulador buck a 5V, o 1x18650 con boost a 5V? (ver DESIGN.md)
+- ¿Batería definitiva? Para probar se usa 1x18650 + boost a 5V; evaluar 2x18650 + buck cuando se sumen los motores (ver DESIGN.md)
 

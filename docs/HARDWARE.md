@@ -6,18 +6,16 @@
 |---|---|---|
 | ESP32-S (DevKit 38 pines) | 1 | Controlador |
 | Protoboard | 1 | Montaje |
-| Servo 9g (SG90 o similar) | 1 (¿más?) | Pan (cabeza) |
-| Motor paso a paso 28BYJ-48 | 1 | Opcional: segundo eje (requiere driver ULN2003) |
+| Servo 9g (SG90 o similar) | 2 | Pan y tilt (cabeza) |
+| Motor paso a paso 28BYJ-48 + placa ULN2003 | 1 | Eje extra (control `T:`) |
 | Potenciómetro 10K | 1 | Entrada analógica: joystick físico de prueba / ajuste |
 | HC-SR04 | 1 | Distancia |
-| Buzzer | varios | Alertas de proximidad |
+| Buzzer activo (y pasivos) | varios | Alerta de proximidad (usar el activo en GPIO 23) |
 | LEDs | varios | Estado / indicadores |
 | Resistencias 220Ω, 1kΩ, 10kΩ | varias | LEDs (220Ω), divisor de ECHO (1kΩ), pull-ups (10kΩ) |
 
-### Faltantes / a confirmar
-- **Segundo servo:** el prototipo prevé 2 servos (pan/tilt). Con uno solo, se prueba pan y tilt queda sin conectar.
-- **Driver ULN2003:** el 28BYJ-48 no se puede conectar directo al ESP32. Hace falta la placa ULN2003 (suele venir con el motor).
-- **Resistencia de 2kΩ:** no la tenés, pero el divisor se arma con 1kΩ + 2×1kΩ en serie (ver abajo).
+### Faltantes
+- **Resistencia de 2kΩ:** no hace falta, el divisor se arma con 3×1kΩ (ver abajo).
 - **Para la batería (después):** boost 5V ≥2A, 18650 y portabaterías.
 
 ## Pinout (ESP32 DevKit 38 pines)

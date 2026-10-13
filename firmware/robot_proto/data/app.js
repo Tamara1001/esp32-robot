@@ -43,7 +43,11 @@ function showDistance(cm) {
 }
 
 function handleMessage(data) {
-  if (data.startsWith("D:")) showDistance(parseFloat(data.slice(2)));
+  if (data.startsWith("D:")) {
+    showDistance(parseFloat(data.slice(2)));
+  } else if (data.startsWith("P:")) {
+    document.getElementById("potVal").textContent = parseInt(data.slice(2), 10);
+  }
 }
 
 function connect() {
@@ -64,6 +68,7 @@ function startMock() {
     t += 0.15;
     const cm = 100 + 80 * Math.sin(t); // simulated obstacle moving back and forth
     handleMessage(`D:${cm.toFixed(1)}`);
+    handleMessage(`P:${Math.round(50 + 50 * Math.sin(t / 3))}`);
   }, MOCK_SENSOR_MS);
 }
 
@@ -125,6 +130,10 @@ joystick.addEventListener("pointerup", () => { dragging = false; });
 document.getElementById("centerBtn").addEventListener("click", () => setServos(90, 90));
 panSlider.addEventListener("input", () => setServos(panSlider.value, tilt));
 tiltSlider.addEventListener("input", () => setServos(pan, tiltSlider.value));
+document.getElementById("stepperSlider").addEventListener("input", (e) => {
+  document.getElementById("stepperVal").textContent = e.target.value;
+  send(`T:${e.target.value}`);
+});
 
 document.addEventListener("keydown", (e) => {
   const moves = {

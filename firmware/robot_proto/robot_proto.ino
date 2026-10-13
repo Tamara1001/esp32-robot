@@ -1,5 +1,6 @@
 // robot_proto.ino
-// Phase 1 prototype: ESP32 (DevKit) + HC-SR04 + 2 servos, controlled from a web joystick over WiFi.
+// Phase 1 prototype: ESP32 (DevKit) + HC-SR04 + 2 servos + stepper + pot + buzzer/LED,
+// controlled from a web joystick over WiFi.
 // See docs/PROTOCOL.md and docs/HARDWARE.md.
 
 #include <WiFi.h>
@@ -17,7 +18,20 @@ Servo servoPan;
 Servo servoTilt;
 
 unsigned long lastSensorMs = 0;
-unsigned long lastCommandMs = 0;
+unsigned long lastPotMs = 0;
+
+// ---- Stepper state (non-blocking) ----
+const uint8_t STEPPER_PINS[4] = {PIN_STEPPER_IN1, PIN_STEPPER_IN2, PIN_STEPPER_IN3, PIN_STEPPER_IN4};
+const uint8_t HALF_STEP_SEQ[8][4] = {
+  {1, 0, 0, 0}, {1, 1, 0, 0}, {0, 1, 0, 0}, {0, 1, 1, 0},
+  {0, 0, 1, 0}, {0, 0, 1, 1}, {0, 0, 0, 1}, {1, 0, 0, 1},
+};
+int stepperPosition = 0;   // current position in steps
+int stepperTarget = 0;     // target position in steps
+uint8_t stepperPhase = 0;
+unsigned long lastStepUs = 0;
+
+int lastPotPercent = -100;
 
 // Returns distance in cm, or -1 if no echo / out of range.
 float readDistanceCm() {
@@ -40,6 +54,37 @@ void applyServos(int pan, int tilt) {
   servoTilt.write(tilt);
 }
 
+void setStepperTargetDeg(int deg) {
+  deg = constrain(deg, 0, 359);
+  stepperTarget = (int)((long)deg * STEPPER_STEPS_PER_REV / 360);
+}
+
+void releaseStepper() {
+  for (uint8_t i = 0; i < 4; i++) digitalWrite(STEPPER_PINS[i], LOW);
+}
+
+// Moves one step per call when due; releases coils at rest to avoid heating.
+void updateStepper() {
+  if (stepperPosition == stepperTarget) {
+    releaseStepper();
+    return;
+  }
+  unsigned long nowUs = micros();
+  if (nowUs - lastStepUs < STEPPER_STEP_INTERVAL_US) return;
+  lastStepUs = nowUs;
+
+  int dir = (stepperTarget > stepperPosition) ? 1 : -1;
+  stepperPhase = (stepperPhase + 8 + dir) % 8;
+  for (uint8_t i = 0; i < 4; i++) digitalWrite(STEPPER_PINS[i], HALF_STEP_SEQ[stepperPhase][i]);
+  stepperPosition += dir;
+}
+
+void updateAlert(float cm) {
+  bool alert = (cm >= 0 && cm < ALERT_DISTANCE_CM);
+  digitalWrite(PIN_BUZZER, alert ? HIGH : LOW);
+  digitalWrite(PIN_LED, alert ? HIGH : LOW);
+}
+
 void onWsEvent(AsyncWebSocket *s, AsyncWebSocketClient *client, AwsEventType type,
                void *arg, uint8_t *data, size_t len) {
   if (type == WS_EVT_CONNECT) {
@@ -54,10 +99,11 @@ void onWsEvent(AsyncWebSocket *s, AsyncWebSocketClient *client, AwsEventType typ
     memcpy(msg, data, n);
     msg[n] = '\0';
 
-    int pan, tilt;
-    if (sscanf(msg, "S:%d,%d", &pan, &tilt) == 2) {
-      applyServos(pan, tilt);
-      lastCommandMs = millis();
+    int a, b;
+    if (sscanf(msg, "S:%d,%d", &a, &b) == 2) {
+      applyServos(a, b);
+    } else if (sscanf(msg, "T:%d", &a) == 1) {
+      setStepperTargetDeg(a);
     }
   }
 }
@@ -67,6 +113,11 @@ void setup() {
 
   pinMode(PIN_TRIG, OUTPUT);
   pinMode(PIN_ECHO, INPUT);
+  pinMode(PIN_BUZZER, OUTPUT);
+  pinMode(PIN_LED, OUTPUT);
+  for (uint8_t i = 0; i < 4; i++) pinMode(STEPPER_PINS[i], OUTPUT);
+  releaseStepper();
+  analogReadResolution(12);
 
   servoPan.setPeriodHertz(50);
   servoTilt.setPeriodHertz(50);
@@ -91,12 +142,23 @@ void setup() {
 
 void loop() {
   ws.cleanupClients();
+  updateStepper();
 
   unsigned long now = millis();
+
   if (now - lastSensorMs >= SENSOR_INTERVAL_MS) {
     lastSensorMs = now;
-    if (ws.count() > 0) {
-      ws.printfAll("D:%.1f", readDistanceCm());
+    float cm = readDistanceCm();
+    updateAlert(cm);
+    if (ws.count() > 0) ws.printfAll("D:%.1f", cm);
+  }
+
+  if (now - lastPotMs >= POT_INTERVAL_MS) {
+    lastPotMs = now;
+    int percent = analogRead(PIN_POT) * 100 / POT_ADC_MAX;
+    if (abs(percent - lastPotPercent) >= POT_REPORT_THRESHOLD) {
+      lastPotPercent = percent;
+      if (ws.count() > 0) ws.printfAll("P:%d", percent);
     }
   }
 }

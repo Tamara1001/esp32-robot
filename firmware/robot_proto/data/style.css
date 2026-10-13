@@ -3,77 +3,123 @@
   --card: #1c1f29;
   --accent: #4cc9f0;
   --ok: #52d68a;
+  --warn: #ffd166;
   --bad: #ef476f;
   --text: #e8eaf0;
+  --joy-size: min(70vh, 38vw);
 }
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
 
-body {
+html, body {
   margin: 0;
+  height: 100%;
+  overflow: hidden;
   font-family: system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
   touch-action: none;
 }
 
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
+/* Landscape: 3 columns using the full screen, no scrolling. */
+#layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 0.8fr;
+  gap: 12px;
+  height: 100dvh;
+  padding: max(8px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+           max(8px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
 }
 
-h1 { font-size: 1.2rem; margin: 0; }
-h2 { font-size: 1rem; margin: 0 0 12px; color: var(--accent); }
+.zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 0;
+}
 
-.status { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; }
-.status.on { background: var(--ok); color: #000; }
-.status.off { background: var(--bad); }
-
-main { display: grid; gap: 16px; padding: 16px; max-width: 480px; margin: 0 auto; }
-
-.card { background: var(--card); border-radius: 12px; padding: 16px; text-align: center; }
+.readout { margin: 0; font-size: 0.85rem; }
 
 #joystick {
   position: relative;
-  width: 220px;
-  height: 220px;
-  margin: 0 auto;
+  width: var(--joy-size);
+  height: var(--joy-size);
   border-radius: 50%;
   background: #262a37;
   border: 2px solid var(--accent);
+  touch-action: none;
 }
 
 #knob {
   position: absolute;
-  width: 70px;
-  height: 70px;
-  left: 75px;
-  top: 75px;
+  width: 32%;
+  height: 32%;
+  left: 34%;
+  top: 34%;
   border-radius: 50%;
   background: var(--accent);
+  pointer-events: none;
 }
+
+.zone-center { justify-content: space-between; width: 100%; }
+.topbar { align-self: flex-end; display: flex; gap: 8px; }
+
+.status { padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; }
+.status.on { background: var(--ok); color: #000; }
+.status.off { background: var(--bad); }
+.status.mock { background: var(--warn); color: #000; }
+.status[hidden] { display: none; }
+
+#camera {
+  flex: 1;
+  width: 100%;
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card);
+  border-radius: 12px;
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+.distance-box { width: 100%; text-align: center; }
+.distance { font-size: 1.8rem; }
+
+.bar { height: 10px; background: #262a37; border-radius: 5px; overflow: hidden; margin-top: 6px; }
+#distanceBar { height: 100%; width: 0; background: var(--ok); transition: width 0.15s; }
+#distanceBar.warn { background: var(--warn); }
+#distanceBar.danger { background: var(--bad); }
+
+.zone-right { width: 100%; }
+label { display: flex; align-items: center; gap: 8px; width: 100%; }
+input[type="range"] { flex: 1; min-width: 0; }
 
 button {
   background: var(--accent);
   border: 0;
   border-radius: 8px;
-  padding: 8px 16px;
+  padding: 10px 18px;
   font-size: 1rem;
+  width: 100%;
 }
 
-.distance { font-size: 2rem; margin: 0; }
+/* Portrait: ask the user to rotate. */
+#rotateHint {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  font-size: 1.2rem;
+  text-align: center;
+  padding: 24px;
+}
 
-.status.mock { background: #ffd166; color: #000; margin-left: auto; margin-right: 8px; }
-.status[hidden] { display: none; }
-
-label { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
-input[type="range"] { flex: 1; }
-.hint { font-size: 0.75rem; opacity: 0.6; margin: 8px 0 0; }
-
-.bar { height: 10px; background: #262a37; border-radius: 5px; overflow: hidden; margin-top: 8px; }
-#distanceBar { height: 100%; width: 0; background: var(--ok); transition: width 0.15s; }
-#distanceBar.warn { background: #ffd166; }
-#distanceBar.danger { background: var(--bad); }
-
+@media (orientation: portrait) {
+  #rotateHint { display: flex; }
+}

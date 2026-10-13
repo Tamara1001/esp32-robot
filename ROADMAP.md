@@ -29,7 +29,12 @@
 - [ ] Estación de carga
 - [ ] Evaluar 6 ruedas
 
+## Decisiones tomadas
+- **4 ruedas** para empezar (6 queda para Fase 3).
+- **Un solo ESP32** (DevKit) al inicio; la cámara se suma después (ver DESIGN.md).
+- **Una sola batería** como objetivo (ver "Alimentación" en DESIGN.md).
+
 ## Preguntas abiertas
-- ¿4 o 6 ruedas? (decidir antes de diseñar el chasis; más ruedas = más motores, más corriente)
-- ¿Un solo ESP32-CAM o ESP32 de control + ESP32-CAM de video?
-- ¿Alimentación de motores y servos: una batería o dos separadas?
+- Al sumar la cámara: ¿ESP32-CAM único o ESP32 de control + ESP32-CAM de video?
+- ¿Batería: 2x18650 en serie (7.4V) con regulador buck a 5V, o 1x18650 con boost a 5V? (ver DESIGN.md)
+

@@ -38,6 +38,17 @@ flowchart LR
 - El pin ECHO del HC-SR04 entrega 5V: usar divisor resistivo (1kΩ / 2kΩ) hacia el GPIO.
 - Capacitor (470–1000 µF) en la alimentación de servos para evitar reinicios por picos.
 
+## Alimentación (una sola batería)
+
+Una celda 18650 (3.7V, hasta 4.2V) sola **no alcanza** para motores + servos + ESP32: baja de 3.3V al descargarse y los picos de los motores reinician el ESP32. Opciones:
+
+| Opción | Detalle | Recomendación |
+|---|---|---|
+| 2x18650 en serie (7.4V) + buck 5V (≥3A) | Motores DC desde el L298N (7.4V), ESP32 y servos desde el buck | Recomendada |
+| 1x18650 + boost a 5V (≥2A) | Más simple, menos autonomía y potencia | Para pruebas |
+
+Reglas: GND común, capacitores cerca de servos/motores, y proteger la batería (BMS/TP4056 con protección). Los 4 motores van a 2 canales del L298N (lado izquierdo en paralelo, lado derecho en paralelo).
+
 ## Evolución prevista
 
 Ver [ROADMAP.md](ROADMAP.md). Al pasar a **ESP32-CAM** habrá pocos GPIO libres: se evaluará un segundo ESP32 (control) comunicado con el ESP32-CAM (video), o un expansor de GPIO. El protocolo WebSocket está pensado para extenderse con nuevos prefijos (`M:` motores, `B:` buzzer).

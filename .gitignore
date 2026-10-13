@@ -1,0 +1,10 @@
+.vscode/
+.idea/
+build/
+*.bin
+*.elf
+*.log
+.DS_Store
+Thumbs.db
+secrets.h
+graphify-out/

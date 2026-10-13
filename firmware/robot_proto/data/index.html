@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>ESP32 Robot</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>ESP32 Robot</h1>
+    <span id="status" class="status off">Desconectado</span>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Joystick</h2>
+      <div id="joystick"><div id="knob"></div></div>
+      <p>Pan: <b id="panVal">90</b>° &nbsp; Tilt: <b id="tiltVal">90</b>°</p>
+      <button id="centerBtn">Centrar</button>
+    </section>
+
+    <section class="card">
+      <h2>Sensor de distancia</h2>
+      <p class="distance"><span id="distance">--</span> cm</p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
